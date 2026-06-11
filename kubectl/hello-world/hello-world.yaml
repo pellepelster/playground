@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: playground1
+  name: hello-world
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: hello-world
-  namespace: playground1
+  namespace: hello-world
 type: kubernetes.io/basic-auth
 stringData:
   username: username1
@@ -18,7 +18,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: hello-world
-  namespace: playground1
+  namespace: hello-world
 spec:
   instances: 1
   imageName: ghcr.io/cloudnative-pg/postgresql:16.4
@@ -34,13 +34,13 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: playground1
+  name: hello-world
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hello-world
-  namespace: playground1
+  namespace: hello-world
 spec:
   replicas: 1
   selector:
@@ -74,7 +74,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hello-world
-  namespace: playground1
+  namespace: hello-world
 spec:
   type: LoadBalancer
   selector:
