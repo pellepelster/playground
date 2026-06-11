@@ -1,0 +1,41 @@
+[settings]
+env_shell_expand = true
+
+[tools]
+kubectl = "1.36.1"
+helm = "4.2.0"
+k3d = "5.9.0"
+k9s = "0.51.0"
+
+[tasks."k3d:bootstrap"]
+description = "start multi node k3d k8s server"
+run = """
+#!/usr/bin/env bash
+k3d cluster create multiserver -p "8080:80@loadbalancer" --servers 3
+"""
+
+[tasks."cnpg:operator:install"]
+description = "install CloudNativePG operator"
+env = { CNPG_VERSION = "1.25.0" }
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo ">> installing CloudNativePG operator v${CNPG_VERSION}"
+kubectl apply --server-side -f "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-${CNPG_VERSION%.*}/releases/cnpg-${CNPG_VERSION}.yaml"
+
+echo ">> waiting for the operator to become ready"
+kubectl rollout status deployment/cnpg-controller-manager -n cnpg-system --timeout=180s
+"""
+
+[tasks."hello-world:apply"]
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo ">> creating hello-world deployment"
+kubectl apply -f kubectl/hello-world.yaml
+
+echo ">> waiting for the hello-world to be ready"
+kubectl wait --for=condition=Available --namespace playground1 deployments/hello-world --timeout=300s
+"""
